@@ -6,7 +6,7 @@ import flightClubLogo from '../images/flightclub.png'
 import stadiumGoodsLogo from '../images/stadiumgoods.png'
 import sneaksLogo from '../images/Sneaks_Logo.png'
 import ProductCard from './ProductCard'
-var _ = require('lodash');
+let _ = require('lodash');
 const myHeaders = new Headers({
   "Content-Type": "application/json",
   Accept: "application/json"
@@ -16,22 +16,22 @@ const MiniCard = (props) => {
   const [showProductCard, setShowProductCard] = useState(false);
   const [newSneaker, setNewSneaker] = useState({});
   const [fetchSneaker, triggerFetchSneaker] = useState(false);
-  var sneaker = props.sneaker;
+  let sneaker = props.sneaker;
   useEffect(() => {
     if (fetchSneaker) {
       fetch("https://sneaks-api.azurewebsites.net/id/" + sneaker.styleID + '/prices', {
-          headers: myHeaders,
-        })
+        headers: myHeaders,
+      })
         .then(response => response.json())
         .then(jsonResponse => {
           setNewSneaker(jsonResponse);
 
         });
     }
-  }, [fetchSneaker]);
+  }, [fetchSneaker, sneaker.styleID]);
 
   const showCard = () => {
-    if (showProductCard == false) {
+    if (showProductCard === false) {
       triggerFetchSneaker(true);
       setShowProductCard(true);
     }
@@ -43,36 +43,39 @@ const MiniCard = (props) => {
     }
   }
 
-  var minPrice;
-  var minPriceLink;
-  var logo = _.minBy(_.keys(sneaker.lowestResellPrice), function (o) {
+  let minPrice;
+  let minPriceLink;
+  let logo = _.minBy(_.keys(sneaker.lowestResellPrice), function (o) {
     return sneaker.lowestResellPrice[o];
   });
 
-  if (logo == 'stockX') {
+  if (logo === 'stockX') {
     logo = stockXLogo;
     minPrice = sneaker.lowestResellPrice.stockX;
     minPriceLink = sneaker.resellLinks.stockX;
 
-  } else if (logo == 'stadiumGoods') {
+  } else if (logo === 'stadiumGoods') {
     logo = stadiumGoodsLogo;
     minPrice = sneaker.lowestResellPrice.stadiumGoods;
     minPriceLink = sneaker.resellLinks.stadiumGoods;
-  } else if (logo == 'goat') {
+  } else if (logo === 'goat') {
     logo = goatLogo;
     minPrice = sneaker.lowestResellPrice.goat;
     minPriceLink = sneaker.resellLinks.goat;
-  } else if (logo == 'flightClub') {
+  } else if (logo === 'flightClub') {
     logo = flightClubLogo;
     minPrice = sneaker.lowestResellPrice.flightClub;
     minPriceLink = sneaker.resellLinks.flightClub;
   }
+
+  let imageClass;
+  let sneakerImage;
   if (sneaker.thumbnail) {
-    var imageClass = 'sneaker-image';
-    var sneakerImage = sneaker.thumbnail;
+    imageClass = 'sneaker-image';
+    sneakerImage = sneaker.thumbnail;
   } else {
-    var imageClass = 'default-image';
-    var sneakerImage = sneaksLogo;
+    imageClass = 'default-image';
+    sneakerImage = sneaksLogo;
   }
 
 
@@ -80,18 +83,18 @@ const MiniCard = (props) => {
   const CardText = () => {
     if (minPrice) {
       return (
-         <Card.Text class='mini-card-text'>
-           <div>From</div>
-           <div class='mini-card-price'>${minPrice} <span class='on-text'> on</span><img class='mini-logo'
-               src={logo}></img></div>
-         </Card.Text>
-    );
-  }
-  else{
-    return(
-      <Card.Text class='mini-card-text'>
-        <div>Not Available</div>
-      </Card.Text>
+        <Card.Text className='mini-card-text'>
+          <div>From</div>
+          <div class='mini-card-price'>${minPrice} <span class='on-text'> on</span><img class='mini-logo'
+            src={logo} alt="mini-logo"></img></div>
+        </Card.Text>
+      );
+    }
+    else {
+      return (
+        <Card.Text className='mini-card-text'>
+          <div>Not Available</div>
+        </Card.Text>
 
       );
     }
@@ -99,22 +102,21 @@ const MiniCard = (props) => {
   }
 
 
-    return(
-      <a onClick={showCard} style={{ cursor: 'pointer' }} class='card-button'>
-        <Card class='mini-card' border="light" tag="a" style={{ cursor: "pointer" }}
-          style={{ width: '15rem', height: '17rem' }}>
-          <Card.Img class={imageClass} variant="top" src={sneakerImage} />
-          <Card.Body class='mini-card-body'>
-            <Card.Title class='card-title'>{sneaker.shoeName}</Card.Title>
-            <CardText />
-          </Card.Body>
-        </Card>
+  return (
+    <a onClick={showCard} style={{ cursor: 'pointer' }} class='card-button'>
+      <Card className='mini-card' border="light" tag="a" style={{ cursor: "pointer", width: '15rem', height: '17rem' }}>
+        <Card.Img className={imageClass} variant="top" src={sneakerImage} />
+        <Card.Body className='mini-card-body'>
+          <Card.Title className='card-title'>{sneaker.shoeName}</Card.Title>
+          <CardText />
+        </Card.Body>
+      </Card>
 
-        {fetchSneaker && <ProductCard sneaker={newSneaker} name={sneaker.shoeName} description={sneaker.description}
-          imageClass={imageClass} image={sneakerImage} minPriceLink={minPriceLink}minPrice={minPrice}
-          logo={logo}show={showProductCard} onHide={hideCard}></ProductCard>
-        }
-      </a>
-    );
+      {fetchSneaker && <ProductCard sneaker={newSneaker} name={sneaker.shoeName} description={sneaker.description}
+        imageClass={imageClass} image={sneakerImage} minPriceLink={minPriceLink} minPrice={minPrice}
+        logo={logo} show={showProductCard} onHide={hideCard}></ProductCard>
+      }
+    </a>
+  );
 }
 export default MiniCard;
